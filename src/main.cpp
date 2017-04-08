@@ -28,6 +28,7 @@
 #include "Tracker.h"
 #include "Config.h"
 
+#include <chrono>
 #include <iostream>
 #include <fstream>
 
@@ -85,6 +86,7 @@ int main(int argc, char* argv[])
 	string imgFormat;
 	float scaleW = 1.f;
 	float scaleH = 1.f;
+    auto start_time = std::chrono::system_clock::now();
 	
 	if (useCamera)
 	{
@@ -101,7 +103,8 @@ int main(int argc, char* argv[])
 		scaleH = (float)conf.frameHeight/tmp.rows;
 
 		initBB = IntRect(conf.frameWidth/2-kLiveBoxWidth/2, conf.frameHeight/2-kLiveBoxHeight/2, kLiveBoxWidth, kLiveBoxHeight);
-		cout << "press 'i' to initialise tracker" << endl;
+		//cout << "press 'i' to initialise tracker" << endl;
+        std::cout << "tracker will initialize in 10 seconds\n";
 	}
 	else
 	{
@@ -154,8 +157,6 @@ int main(int argc, char* argv[])
 		initBB = FloatRect(xmin*scaleW, ymin*scaleH, width*scaleW, height*scaleH);
 	}
 	
-	
-	
 	Tracker tracker(conf);
 	if (!conf.quietMode)
 	{
@@ -191,6 +192,13 @@ int main(int argc, char* argv[])
 			else if (!tracker.IsInitialised())
 			{
 				rectangle(result, initBB, CV_RGB(255, 255, 255));
+                auto d = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start_time);
+                if (d.count() < 5)
+                {
+                    std::cout << "tracker will initialize in " << 5 - d.count() << " seconds\n";
+                }
+                else
+                    doInitialise = true;
 			}
 		}
 		else
