@@ -28,3 +28,6 @@ add_executable(struck ${HEADERS} ${SRC})
 target_link_libraries(struck
     ${OpenCV_LIBS}
 )
+
+configure_file("config.txt" "bin/config.txt")
+configure_file("run_experiments.sh" "bin/run_experiments.sh" @ONLY)
