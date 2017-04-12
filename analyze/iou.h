@@ -27,6 +27,13 @@ namespace analyze
             iou() = default;
 
             /**
+             * \brief       Construct an IoU object with the specified value.
+             * \param[in]   value   The value to assign to the IoU.
+             * \throws      None
+             */
+            explicit iou(const float& value) noexcept : m_value(value) {}
+
+            /**
              * \brief       Construct an IoU for two bounding boxes.
              * \tparam      T           The data type of the bounding box coordinates.
              * \param[in]   box1,box2   The two bounding boxes for which to calculate the IoU.
@@ -41,11 +48,11 @@ namespace analyze
                         const float intersection_area = area(intersection(box1, box2));
                         const float area1 = area(box1);
                         const float area2 = area(box2);
-                        m_iou = intersection_area / (area1 + area2 - intersection_area);
+                        m_value = intersection_area / (area1 + area2 - intersection_area);
                     }
                     catch (...)
                     {
-                        m_iou = 0.0f;
+                        m_value = 0.0f;
                     }
                 }
 
@@ -86,11 +93,21 @@ namespace analyze
              * \return  The IoU value. This is a proportion, on [0, 1].
              * \throws  None
              */
-            iou_type value() const noexcept { return m_iou; }
+            iou_type value() const noexcept { return m_value; }
 
         private:
-            float m_iou = 0.0f; ///< The value of the IoU.
+            float m_value = 0.0f; ///< The value of the IoU.
     };
+
+    bool operator<(const iou& a, const iou& b) noexcept
+    {
+        return a.value() < b.value();
+    }
+
+    iou operator+(const iou& a, const iou& b) noexcept
+    {
+        return iou(a.value() + b.value());
+    }
 }
 
 #endif

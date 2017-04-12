@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <vector>
 #include "bounding_box.h"
 #include "ctype.h"
@@ -124,6 +125,17 @@ namespace analyze
 
         for (const auto i : ious)
             file << i.value() << std::endl;
+
+        // write the minimum, average, and maximum
+        file << "minimum: "   << std::min_element(ious.cbegin(), ious.cend())->value()
+             << "\nmaximum: " << std::max_element(ious.cbegin(), ious.cend())->value()
+             << "\naverage: " << std::accumulate(ious.cbegin(), ious.cend(), iou(0.0f)).value() / ious.size();
+             //<< "\naverage: " << std::accumulate(ious.cbegin(),
+             //                                    ious.cend(),
+             //                                    [](const iou& a, const iou&b) -> float
+             //                                    {
+             //                                       return a.value() + b.value();
+             //                                    }) / ious.size();
     }
 
     /**
