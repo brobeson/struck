@@ -5,7 +5,7 @@
 #include "ctype.h"
 
 
-namespace iou
+namespace analyze
 {
     using box_list = std::vector<bounding_box<float>>;
 
@@ -15,7 +15,7 @@ namespace iou
         if (!file)
             throw std::runtime_error("could not open results file " + file_name);
 
-        std::locale comma_delimiter(std::locale::classic(), new iou::ctype);
+        std::locale comma_delimiter(std::locale::classic(), new ctype);
         file.imbue(comma_delimiter);
 
         float left, right, top, bottom;
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
     };
 
     for (const auto& sequence: sequences)
-        iou::analyze(sequence);
+        analyze::analyze(sequence);
 
     return 0;
 }

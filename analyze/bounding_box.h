@@ -1,7 +1,7 @@
 #ifndef IOU_BOUNDING_BOX_H
 #define IOU_BOUNDING_BOX_H
 
-namespace iou
+namespace analyze
 {
     template <class T>
     class bounding_box final

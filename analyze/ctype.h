@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <locale>
 
-namespace iou
+namespace analyze
 {
     /**
      * \brief       Custom character classification to consider commas as delimiters.
