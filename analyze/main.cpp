@@ -9,12 +9,11 @@ namespace iou
 {
     using box_list = std::vector<bounding_box<float>>;
 
-    box_list loadResults(std::string sequence)
+    box_list load_results(const std::string& file_name)
     {
-        sequence.append(".csv");
-        std::ifstream file(sequence.c_str());
+        std::ifstream file(file_name.c_str());
         if (!file)
-            throw std::runtime_error("could not open results file " + sequence);
+            throw std::runtime_error("could not open results file " + file_name);
 
         std::locale comma_delimiter(std::locale::classic(), new iou::ctype);
         file.imbue(comma_delimiter);
@@ -30,13 +29,35 @@ namespace iou
         return boxes;
     }
 
+    void sanity_check(const box_list& boxes, const std::string& file_name)
+    {
+        std::ofstream file(file_name.c_str());
+        if (file)
+        {
+            for (const auto& box: boxes)
+                file << box.left() << "," << box.right() << "," << box.top() << "," << box.bottom() << "\n";
+        }
+    }
 
     void analyze(const std::string& sequence)
     {
         std::cout << "analyzing " << sequence << "...\n";
         try
         {
-            auto results = loadResults(sequence);
+            // load the struck results for the sequence
+            auto results = load_results(sequence + ".csv");
+
+            // load the ground truth for the sequence
+            std::string ground_truth_path("/home/brendan/Videos/struck_data/");
+            ground_truth_path.append(sequence)
+                             .append("/")
+                             .append(sequence)
+                             .append("_gt.txt");
+            auto ground_truth = load_results(ground_truth_path);
+
+            //sanity_check(results, "results.txt");
+            //sanity_check(ground_truth, "ground_truth.txt");
+
         }
         catch (std::exception& e)
         {
