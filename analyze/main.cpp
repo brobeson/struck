@@ -3,11 +3,14 @@
 #include <vector>
 #include "bounding_box.h"
 #include "ctype.h"
+#include "iou.h"
 
 
 namespace analyze
 {
     using box_list = std::vector<bounding_box<float>>;
+
+    using iou_list = std::vector<iou<float>>;
 
     box_list load_results(const std::string& file_name)
     {
@@ -18,15 +21,26 @@ namespace analyze
         std::locale comma_delimiter(std::locale::classic(), new ctype);
         file.imbue(comma_delimiter);
 
-        float left, right, top, bottom;
+        float left, width, top, height;
         box_list boxes;
         while (file)
         {
-            file >> left >> right >> top >> bottom;
+            file >> left >> width >> top >> height;
             if (file)
-                boxes.emplace_back(left, right, top, bottom);
+                boxes.emplace_back(left, left + width, top, top + height);
         }
         return boxes;
+    }
+
+    iou_list calculate_ious(const box_list& results, const box_list& ground_truth)
+    {
+        iou_list ious;
+
+        constexpr box_list::size_type stride = 5;
+        const auto length = std::min(results.size(), ground_truth.size());
+        for (box_list::size_type b = 0; b < length; b += stride)
+            ious.emplace_back(results[b], ground_truth[b]);
+        return ious;
     }
 
     void sanity_check(const box_list& boxes, const std::string& file_name)
@@ -37,6 +51,28 @@ namespace analyze
             for (const auto& box: boxes)
                 file << box.left() << "," << box.right() << "," << box.top() << "," << box.bottom() << "\n";
         }
+    }
+
+    void validate_box_lists(const box_list& results, const box_list& ground_truth)
+    {
+        if (results.size() != ground_truth.size())
+        {
+            std::cerr << "warning: There are " << results.size() << " results boxes, and " << ground_truth.size() << " ground truth boxes.\n"
+                      << "         Only the first " << std::min(results.size(), ground_truth.size()) << " boxes will be considered.\n";
+        }
+    }
+
+    void write_ious(const iou_list& ious, const std::string& file_name)
+    {
+        std::ofstream file(file_name.c_str());
+        if (!file)
+        {
+            std::cerr << "error: could not open " << file_name << " for writing IoU data.\n";
+            return;
+        }
+
+        for (const auto i : ious)
+            file << i.value() << std::endl;
     }
 
     void analyze(const std::string& sequence)
@@ -58,6 +94,9 @@ namespace analyze
             //sanity_check(results, "results.txt");
             //sanity_check(ground_truth, "ground_truth.txt");
 
+            validate_box_lists(results, ground_truth);
+            const auto ious = calculate_ious(results, ground_truth);
+            write_ious(ious, sequence + ".ious");
         }
         catch (std::exception& e)
         {

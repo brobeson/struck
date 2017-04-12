@@ -1,6 +1,8 @@
 #ifndef IOU_BOUNDING_BOX_H
 #define IOU_BOUNDING_BOX_H
 
+#include <cmath>
+
 namespace analyze
 {
     template <class T>
@@ -46,7 +48,24 @@ namespace analyze
     template <class T>
         T area(const bounding_box<T>& box)
         {
-            return std::abs(box.left() - box.right()) * std::abs(box.top() - box.bottom());
+            return std::fabs(box.left() - box.right()) * std::fabs(box.top() - box.bottom());
+        }
+
+    template <class T>
+        bounding_box<T> intersection(const bounding_box<T>& box1, const bounding_box<T>& box2)
+        {
+            if ((box1.bottom() < box2.top())  ||
+                (box2.bottom() < box2.top())  ||
+                (box1.right()  < box2.left()) ||
+                (box2.right()  < box2.left()))
+            {
+                throw std::runtime_error("box 1 and box 2 do not intersect");
+            }
+
+            return bounding_box<T>(std::max(box1.left(),   box2.left()),
+                                   std::min(box1.right(),  box2.right()),
+                                   std::max(box1.top(),    box2.top()),
+                                   std::min(box1.bottom(), box2.bottom()));
         }
 }
 
