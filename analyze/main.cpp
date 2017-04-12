@@ -8,10 +8,28 @@
 
 namespace analyze
 {
+    /// Alias the type representing a list of bounding boxes.
     using box_list = std::vector<bounding_box<float>>;
 
-    using iou_list = std::vector<iou<float>>;
+    /// Alias the type representing a list of IoU objects.
+    using iou_list = std::vector<iou>;
 
+    /**
+     * \brief       Read bounding box data from a file.
+     * \param[in]   file_name   The path to the file containing the bounding box data.
+     * \return      A list of bounding box data from the file.
+     * \throws      std::runtime_error  This is thrown if the file cannot be opened.
+     * \details     Bounding box data in the file must adhere to these restrictions:
+     *              \li The file must be plain text.
+     *              \li Each line must correspond to one frame of imagery or video.
+     *              \li Each line must contain four values, in this order: bounding box left edge,
+     *              bounding box width, bounding box top edge, bounding box height, all measured in
+     *              pixels.
+     *              \li Fractional pixels are allowed, but not required.
+     *              \li Each value in a line must be separated by a comma.
+     *              \li Nothing else may be on the line.
+     *              Results are undefined if the file violates any of these restrictions.
+     */
     box_list load_results(const std::string& file_name)
     {
         std::ifstream file(file_name.c_str());
@@ -32,7 +50,17 @@ namespace analyze
         return boxes;
     }
 
-    iou_list calculate_ious(const box_list& results, const box_list& ground_truth)
+    /**
+     * \brief       Calculate IoU values for two lists of bounding boxes.
+     * \param[in]   results         The list of bounding boxes representing algorithm results.
+     * \param[in]   ground_truth    The list of bounding boxes representing ground truth.
+     * \return      A list of intersection-over-union (IoU) values.
+     * \throws      None
+     * \details     Each entry in the IoU list is the IoU for the corresponding entries in the
+     *              \a results and \a ground_truth lists. The IoU formula is:
+     *              \f$ IoU(B,G) = \frac{B \cap G}{B \cup G} \f$
+     */
+    iou_list calculate_ious(const box_list& results, const box_list& ground_truth) noexcept
     {
         iou_list ious;
 
@@ -43,7 +71,17 @@ namespace analyze
         return ious;
     }
 
-    void sanity_check(const box_list& boxes, const std::string& file_name)
+    /**
+     * \brief       Write a list of bounding boxes to a file.
+     * \param[in]   boxes       The list of boxes to write.
+     * \param[in]   file_name   The path to the file to write.
+     * \throws      None.
+     * \details     The purpose of this function is that a user can compare the written file to the
+     *              file from which the boxes were read.
+     * \warning     This will overwrite \a file_name without asking.
+     * \todo        Move this to a unit test.
+     */
+    void sanity_check(const box_list& boxes, const std::string& file_name) noexcept
     {
         std::ofstream file(file_name.c_str());
         if (file)
@@ -53,7 +91,13 @@ namespace analyze
         }
     }
 
-    void validate_box_lists(const box_list& results, const box_list& ground_truth)
+    /**
+     * \brief       Determine if there are an equal number of results as ground truth.
+     * \param[in]   results         The list of algorithm results bounding boxes.
+     * \param[in]   ground_truth    The list of ground truth bounding boxes.
+     * \throws      None
+     */
+    void validate_box_lists(const box_list& results, const box_list& ground_truth) noexcept
     {
         if (results.size() != ground_truth.size())
         {
@@ -62,7 +106,14 @@ namespace analyze
         }
     }
 
-    void write_ious(const iou_list& ious, const std::string& file_name)
+    /**
+     * \brief       Write a list of IoU values to a file.
+     * \param[in]   ious        The list of IoU values to write.
+     * \param[in]   file_name   The path to the file to write.
+     * \throws      None
+     * \details     This writes one IoU for each line.
+     */
+    void write_ious(const iou_list& ious, const std::string& file_name) noexcept
     {
         std::ofstream file(file_name.c_str());
         if (!file)
@@ -75,7 +126,14 @@ namespace analyze
             file << i.value() << std::endl;
     }
 
-    void analyze(const std::string& sequence)
+    /**
+     * \brief       Analyze the tracking results for a video or image sequence.
+     * \param[in]   sequence
+     * \throws      None
+     * \details     This will load the bounding box results and ground truth, then calculate and
+     *              output IoU data.
+     */
+    void analyze(const std::string& sequence) noexcept
     {
         std::cout << "analyzing " << sequence << "...\n";
         try
