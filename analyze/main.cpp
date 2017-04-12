@@ -1,12 +1,15 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "bounding_box.h"
 #include "ctype.h"
 
 
 namespace iou
 {
-    void loadResults(std::string sequence)
+    using box_list = std::vector<bounding_box<float>>;
+
+    box_list loadResults(std::string sequence)
     {
         sequence.append(".csv");
         std::ifstream file(sequence.c_str());
@@ -16,12 +19,15 @@ namespace iou
         std::locale comma_delimiter(std::locale::classic(), new iou::ctype);
         file.imbue(comma_delimiter);
 
-        float x = 0.0f;
-        for (int i = 0; i < 10; ++i)
+        float left, right, top, bottom;
+        box_list boxes;
+        while (file)
         {
-            file >> x;
-            std::cout << "x_" << i << " == " << x << std::endl;
+            file >> left >> right >> top >> bottom;
+            if (file)
+                boxes.emplace_back(left, right, top, bottom);
         }
+        return boxes;
     }
 
 
@@ -30,7 +36,7 @@ namespace iou
         std::cout << "analyzing " << sequence << "...\n";
         try
         {
-            loadResults(sequence);
+            auto results = loadResults(sequence);
         }
         catch (std::exception& e)
         {
