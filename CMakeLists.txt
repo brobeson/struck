@@ -31,3 +31,6 @@ target_link_libraries(struck
 
 configure_file("config.txt" "bin/config.txt")
 configure_file("run_experiments.sh" "bin/run_experiments.sh" @ONLY)
+
+# build a tool to automate data analysis
+add_subdirectory(analyze)
