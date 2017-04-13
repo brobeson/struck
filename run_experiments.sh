@@ -17,5 +17,6 @@ do
     sed --in-place 's/#\?resultsPath.*$/resultsPath = '${s}'.csv/' ${config_file}
     sed --in-place 's/#\?sequenceName.*$/sequenceName = '${s}'/' ${config_file}
     ./struck config.txt
+    ./analyze ${s}
     echo
 done

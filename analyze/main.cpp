@@ -130,12 +130,6 @@ namespace analyze
         file << "minimum: "   << std::min_element(ious.cbegin(), ious.cend())->value()
              << "\nmaximum: " << std::max_element(ious.cbegin(), ious.cend())->value()
              << "\naverage: " << std::accumulate(ious.cbegin(), ious.cend(), iou(0.0f)).value() / ious.size();
-             //<< "\naverage: " << std::accumulate(ious.cbegin(),
-             //                                    ious.cend(),
-             //                                    [](const iou& a, const iou&b) -> float
-             //                                    {
-             //                                       return a.value() + b.value();
-             //                                    }) / ious.size();
     }
 
     /**
@@ -178,20 +172,14 @@ namespace analyze
 
 int main(int argc, char** argv)
 {
-    const std::vector<std::string> sequences =
+    if (argc < 2)
     {
-        "coke11",
-        //"david",
-        //"faceocc",
-        //"faceocc2",
-        //"girl",
-        //"sylv",
-        //"tiger1",
-        //"tiger2"
-    };
+        std::cerr << "error: at least one sequence is required\n";
+        return EXIT_FAILURE;
+    }
 
-    for (const auto& sequence: sequences)
-        analyze::analyze(sequence);
+    for (int a = 1; a < argc; ++a)
+        analyze::analyze(argv[a]);
 
     return 0;
 }
