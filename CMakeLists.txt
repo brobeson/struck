@@ -12,6 +12,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
+#find_package(OpenCV-contrib REQUIRED)
+#find_path(vlfeat_headers 
 
 include_directories(
     src
@@ -24,10 +26,16 @@ file(GLOB_RECURSE SRC RELATIVE ${PROJECT_SOURCE_DIR} src/*.cpp)
 file(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} src/*.h)
 
 add_executable(struck ${HEADERS} ${SRC})
+#target_include_directories(struck PRIVATE "/usr/include/vl")
 
 target_link_libraries(struck
     ${OpenCV_LIBS}
 )
+target_include_directories(struck PRIVATE
+    #"/home/brendan/repositories/opencv_contrib/opencv_contrib/modules/xfeatures2d/include"
+    #"/home/brendan/repositories/opencv/opencv/modules/features2d/include"
+    #"/home/brendan/repositories/opencv/opencv/modules/core/include")
+    "/home/brendan/repositories/vlfeat/vlfeat")
 
 configure_file("config.txt" "bin/config.txt")
 configure_file("run_experiments.sh" "bin/run_experiments.sh" @ONLY)
