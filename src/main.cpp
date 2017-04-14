@@ -228,6 +228,11 @@ int main(int argc, char* argv[])
 			{
 				tracker.Debug();
 			}
+            else
+            {
+                std::cout << ".";
+                cout.flush();
+            }
 
 			rectangle(result, tracker.GetBB(), CV_RGB(0, 255, 0));
 
@@ -264,6 +269,8 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
+
+    std::cout << std::endl;
 
 	if (outFile.is_open())
 	{
