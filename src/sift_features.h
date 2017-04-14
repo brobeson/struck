@@ -5,7 +5,7 @@
 
 extern "C"
 {
-    #include "vlfeat/sift.h"
+    #include <vl/sift.h>
 }
 
 /// Encapsulate a set of SIFT features.
