@@ -36,6 +36,7 @@
 #include "RawFeatures.h"
 #include "HistogramFeatures.h"
 #include "MultiFeatures.h"
+#include "sift_features.h"
 
 #include "Kernels.h"
 
@@ -106,6 +107,11 @@ void Tracker::Reset()
 			m_features.push_back(new HistogramFeatures(m_config));
 			m_needsIntegralHist = true;
 			break;
+        case Config::kFeatureTypeSift:
+            m_features.emplace_back(new sift_features(m_config.frameWidth,
+                                                      m_config.frameHeight));
+            break;
+        /// \todo Uh... what about a default?
 		}
 		featureCounts.push_back(m_features.back()->GetCount());
 
@@ -123,6 +129,7 @@ void Tracker::Reset()
 		case Config::kKernelTypeChi2:
 			m_kernels.push_back(new Chi2Kernel());
 			break;
+        /// \todo Uh... what about a default?
 		}
 	}
 

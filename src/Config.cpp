@@ -76,6 +76,7 @@ Config::Config(const std::string& path)
 			if      (featureName == FeatureName(kFeatureTypeHaar)) fkp.feature = kFeatureTypeHaar;
 			else if (featureName == FeatureName(kFeatureTypeRaw)) fkp.feature = kFeatureTypeRaw;
 			else if (featureName == FeatureName(kFeatureTypeHistogram)) fkp.feature = kFeatureTypeHistogram;
+            else if (featureName == FeatureName(kFeatureTypeSift)) fkp.feature = kFeatureTypeSift;
 			else
 			{
 				cout << "error: unrecognised feature: " << featureName << endl;
@@ -137,6 +138,8 @@ std::string Config::FeatureName(FeatureType f)
 		return "haar";
 	case kFeatureTypeHistogram:
 		return "histogram";
+    case kFeatureTypeSift:
+        return "sift";
 	default:
 		return "";
 	}

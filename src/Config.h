@@ -44,7 +44,8 @@ public:
 	{
 		kFeatureTypeHaar,
 		kFeatureTypeRaw,
-		kFeatureTypeHistogram
+		kFeatureTypeHistogram,
+        kFeatureTypeSift
 	};
 
 	enum KernelType
