@@ -32,7 +32,7 @@ do
     ./struck config.txt
     if [[ ! $? -eq 0 ]]
     then
-        >&2 echo -e "${error_color}error: struck failed to complete sequence ${s}, skipping analysis"
+        >&2 echo -e "${error_color}error: struck failed to complete sequence ${s}, skipping analysis${no_color}"
     else
         ./analyze ${s}
     fi
