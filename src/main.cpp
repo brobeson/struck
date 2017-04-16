@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 	bool paused = false;
 	bool doInitialise = false;
 	srand(conf.seed);
-    sift::feature_list sf(conf.frameWidth, conf.frameHeight);
+    sift::feature_list sf(conf.frameWidth, conf.frameHeight, 2);
 	for (int frameInd = startFrame; frameInd <= endFrame; ++frameInd)
 	{
 		Mat frame;
@@ -236,13 +236,16 @@ int main(int argc, char* argv[])
                 const auto list = sf.list();
                 for (const auto& feature : list)
                 {
-                    cv::circle(first_frame,
-                               cv::Point(feature.keypoint().x(), feature.keypoint().y()),
-                               feature.keypoint().scale(),
-                               Scalar(255));
+                    if (feature.keypoint().octave() == 2)
+                    {
+                        cv::circle(first_frame,
+                                   cv::Point(feature.keypoint().x(), feature.keypoint().y()),
+                                   feature.keypoint().scale(),
+                                   Scalar(255));
+                    }
                 }
 
-                cv::imwrite("first_frame.png", first_frame);
+                cv::imwrite((conf.sequenceName + ".png").c_str(), first_frame);
             }
 
 			tracker.Track(frame);

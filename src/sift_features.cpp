@@ -99,9 +99,13 @@ namespace sift
     //                                                                      sift features methods
     //---------------------------------------------------------------------------------------------
     feature_list::feature_list(const int width, const int height):
+        feature_list(width, height, std::log2(std::min(width, height)))
+    {}
+
+    feature_list::feature_list(const int width, const int height, const int octaves):
         m_pFilter(vl_sift_new(width,
                               height,
-                              std::log2(std::min(width, height)),
+                              std::min(octaves, static_cast<int>(std::log2(std::min(width, height)))),
                               levels_per_octave,
                               first_octave))
     {}
@@ -120,12 +124,13 @@ namespace sift
         auto vlImage = opencvToVlfeat(cvImage);
 
         // process the first octave
-        auto error = VL_ERR_OK;vl_sift_process_first_octave(m_pFilter, vlImage.data());
+        auto error = vl_sift_process_first_octave(m_pFilter, vlImage.data());
         process(m_pFilter, *this);
 
-        while (error != VL_ERR_OK)
+        while (error == VL_ERR_OK)
         {
            error = vl_sift_process_next_octave(m_pFilter);
+           process(m_pFilter, *this);
         }
     }
 

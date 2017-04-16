@@ -133,6 +133,16 @@ namespace sift
             feature_list(const int width, const int height);
 
             /**
+             * \copydoc     feature_list(const int, const int)
+             * \param[in]   width,height    The dimensions of the images for which SIFT features will be
+             *                              extracted.
+             * \param[in]   octaves         The number of octaves to use. This is clamped in such to
+             *                              \f$ \log_2 \left( \min(width, height ) \right) \f$.
+             * \throws      std::bad_alloc  This will be thrown if allocation of a SIFT filter fails.
+             */
+            feature_list(const int width, const int height, const int octaves);
+
+            /**
              * \brief   Copy a set of SIFT features.
              * \throws  Unknown
              */
