@@ -34,6 +34,7 @@
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+#include "sift_features.h"
 
 using namespace std;
 using namespace cv;
@@ -167,6 +168,7 @@ int main(int argc, char* argv[])
 	bool paused = false;
 	bool doInitialise = false;
 	srand(conf.seed);
+    sift::feature_list sf(conf.frameWidth, conf.frameHeight);
 	for (int frameInd = startFrame; frameInd <= endFrame; ++frameInd)
 	{
 		Mat frame;
@@ -222,6 +224,27 @@ int main(int argc, char* argv[])
 
 		if (tracker.IsInitialised())
 		{
+            if (frameInd == startFrame)
+            {
+                auto first_frame = frame.clone();
+
+                sf.evaluate(first_frame);
+                std::ofstream sf_file("sift.txt");
+                if (sf_file)
+                    sf_file << sf;
+
+                const auto list = sf.list();
+                for (const auto& feature : list)
+                {
+                    cv::circle(first_frame,
+                               cv::Point(feature.keypoint().x(), feature.keypoint().y()),
+                               feature.keypoint().scale(),
+                               Scalar(255));
+                }
+
+                cv::imwrite("first_frame.png", first_frame);
+            }
+
 			tracker.Track(frame);
 
 			if (!conf.quietMode && conf.debugMode)
