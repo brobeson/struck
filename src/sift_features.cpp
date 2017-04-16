@@ -17,22 +17,18 @@ namespace struck
      *          and [the SIFT detector](http://www.vlfeat.org/api/sift.html#sift-intro-detector).
      */
     constexpr int FIRST_OCTAVE = 0;
-}
 
-sift_features::sift_features(const int width, const int height):
-    m_pFilter(vl_sift_new(width,
-                          height,
-                          std::log2(std::min(width, height)),
-                          struck::LEVELS,
-                          struck::FIRST_OCTAVE))
-{}
+    sift_features::sift_features(const int width, const int height):
+        m_pFilter(vl_sift_new(width,
+                              height,
+                              std::log2(std::min(width, height)),
+                              struck::LEVELS,
+                              struck::FIRST_OCTAVE))
+    {}
 
 
-sift_features::~sift_features() noexcept
-{
-    vl_sift_delete(m_pFilter);
-}
-
-void sift_features::UpdateFeatureVector(const Sample& s)
-{
+    sift_features::~sift_features() noexcept
+    {
+        vl_sift_delete(m_pFilter);
+    }
 }
