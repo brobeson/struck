@@ -180,7 +180,7 @@ void Tracker::Track(const cv::Mat& frame)
 
 	double bestScore = -DBL_MAX;
 	int bestInd = -1;
-	for (int i = 0; i < (int)keptRects.size(); ++i)
+	for (std::vector<double>::size_type i = 0; i < scores.size(); ++i)
 	{
 		if (scores[i] > bestScore)
 		{
