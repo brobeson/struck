@@ -178,13 +178,10 @@ namespace sift
 
             std::vector<feature_t> list() const { return m_features; }
 
-            //virtual void Eval(const MultiSample& s, std::vector<Eigen::VectorXd>& featVecs) override;
-
             void evaluate(const cv::Mat& cvImage);
 
         protected:
-            /// \todo Implement this.
-            virtual void UpdateFeatureVector(const Sample& s) override {};
+            virtual void UpdateFeatureVector(const Sample& s) override;
 
         private:
             VlSiftFilt* m_pFilter = nullptr; ///< The filter used by VLFeat to extract SIFT features.

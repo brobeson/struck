@@ -83,7 +83,6 @@ int main(int argc, char* argv[])
 
 	int startFrame = -1;
 	int endFrame = -1;
-	FloatRect initBB;
 	string imgFormat;
 	float scaleW = 1.f;
 	float scaleH = 1.f;
@@ -103,7 +102,7 @@ int main(int argc, char* argv[])
 		scaleW = (float)conf.frameWidth/tmp.cols;
 		scaleH = (float)conf.frameHeight/tmp.rows;
 
-		initBB = IntRect(conf.frameWidth/2-kLiveBoxWidth/2, conf.frameHeight/2-kLiveBoxHeight/2, kLiveBoxWidth, kLiveBoxHeight);
+		conf.bounding_box = IntRect(conf.frameWidth/2-kLiveBoxWidth/2, conf.frameHeight/2-kLiveBoxHeight/2, kLiveBoxWidth, kLiveBoxHeight);
 		//cout << "press 'i' to initialise tracker" << endl;
         std::cout << "tracker will initialize in 10 seconds\n";
 	}
@@ -155,7 +154,7 @@ int main(int argc, char* argv[])
 			cout << "error: could not parse sequence gt file" << endl;
 			return EXIT_FAILURE;
 		}
-		initBB = FloatRect(xmin*scaleW, ymin*scaleH, width*scaleW, height*scaleH);
+		conf.bounding_box = FloatRect(xmin*scaleW, ymin*scaleH, width*scaleW, height*scaleH);
 	}
 
 	Tracker tracker(conf);
@@ -168,7 +167,7 @@ int main(int argc, char* argv[])
 	bool paused = false;
 	bool doInitialise = false;
 	srand(conf.seed);
-    sift::feature_list sf(conf.frameWidth, conf.frameHeight, 2);
+    sift::feature_list sf(conf.bounding_box.Width(), conf.bounding_box.Height());
 	for (int frameInd = startFrame; frameInd <= endFrame; ++frameInd)
 	{
 		Mat frame;
@@ -187,13 +186,13 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					tracker.Initialise(frame, initBB);
+					tracker.Initialise(frame, conf.bounding_box);
 				}
 				doInitialise = false;
 			}
 			else if (!tracker.IsInitialised())
 			{
-				rectangle(result, initBB, CV_RGB(255, 255, 255));
+				rectangle(result, conf.bounding_box, CV_RGB(255, 255, 255));
                 auto d = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start_time);
                 if (d.count() < 5)
                 {
@@ -218,7 +217,7 @@ int main(int argc, char* argv[])
 
 			if (frameInd == startFrame)
 			{
-				tracker.Initialise(frame, initBB);
+				tracker.Initialise(frame, conf.bounding_box);
 			}
 		}
 
@@ -226,7 +225,12 @@ int main(int argc, char* argv[])
 		{
             if (frameInd == startFrame)
             {
-                auto first_frame = frame.clone();
+                cv::Rect bb(conf.bounding_box.XMin(), conf.bounding_box.YMin(), conf.bounding_box.Width(), conf.bounding_box.Height());
+                //cv::Mat first_frame = Mat(frame, bb).clone();
+                cv::Mat first_frame;
+                cv::cvtColor(Mat(frame, bb), first_frame, cv::COLOR_GRAY2RGB);
+
+                //auto first_frame = frame.clone();
 
                 sf.evaluate(first_frame);
                 std::ofstream sf_file("sift.txt");
@@ -236,13 +240,10 @@ int main(int argc, char* argv[])
                 const auto list = sf.list();
                 for (const auto& feature : list)
                 {
-                    if (feature.keypoint().octave() == 2)
-                    {
-                        cv::circle(first_frame,
-                                   cv::Point(feature.keypoint().x(), feature.keypoint().y()),
-                                   feature.keypoint().scale(),
-                                   Scalar(255));
-                    }
+                    cv::circle(first_frame,
+                               cv::Point(feature.keypoint().x(), feature.keypoint().y()),
+                               feature.keypoint().scale(),
+                               Scalar(0, 0, 255, 255));
                 }
 
                 cv::imwrite((conf.sequenceName + ".png").c_str(), first_frame);

@@ -138,4 +138,9 @@ namespace sift
     {
         m_features.push_back(f);
     }
+
+    void feature_list::UpdateFeatureVector(const Sample& s)
+    {
+        std::cout << "evaluating SIFT features\n";
+    }
 }

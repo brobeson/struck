@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <ostream>
+#include "Rect.h"
 
 #define VERBOSE (0)
 
@@ -78,6 +79,7 @@ public:
 	double							svmC;
 	int								svmBudgetSize;
 	std::vector<FeatureKernelPair>	features;
+	FloatRect                       bounding_box; ///< The bounding box used for tracking.
 
 	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 

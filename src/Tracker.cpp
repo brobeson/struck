@@ -108,8 +108,8 @@ void Tracker::Reset()
 			m_needsIntegralHist = true;
 			break;
         case Config::kFeatureTypeSift:
-            m_features.emplace_back(new sift::feature_list(m_config.frameWidth,
-                                                           m_config.frameHeight));
+            m_features.emplace_back(new sift::feature_list(m_config.bounding_box.Width(),
+                                                           m_config.bounding_box.Height()));
             break;
         /// \todo Uh... what about a default?
 		}
