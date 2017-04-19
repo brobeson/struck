@@ -186,6 +186,7 @@ namespace sift
         private:
             VlSiftFilt* m_pFilter = nullptr; ///< The filter used by VLFeat to extract SIFT features.
             std::vector<feature_t> m_features;
+            cv::Mat m_patchImage;
     };
 
     std::ostream& operator<<(std::ostream& output, const feature_list& f);

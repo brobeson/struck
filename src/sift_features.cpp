@@ -107,7 +107,8 @@ namespace sift
                               height,
                               std::min(octaves, static_cast<int>(std::log2(std::min(width, height)))),
                               levels_per_octave,
-                              first_octave))
+                              first_octave)),
+        m_patchImage(width, height, CV_8UC1)
     {}
 
 
@@ -141,6 +142,16 @@ namespace sift
 
     void feature_list::UpdateFeatureVector(const Sample& s)
     {
-        std::cout << "evaluating SIFT features\n";
+        IntRect rect = s.GetROI(); // note this truncates to integers
+        cv::Rect roi(rect.XMin(), rect.YMin(), rect.Width(), rect.Height());
+        cv::resize(s.GetImage().GetImage(0)(roi), m_patchImage, m_patchImage.size());
+        evaluate(m_patchImage);
+
+        SetCount(m_features.size() * 128);
+        for (int i = 0; i < m_features.size(); ++i)
+        {
+            for (int j = 0; j < 128; ++j)
+                m_featVec[i] = m_features[i].descriptor()[j];
+        }
     }
 }
