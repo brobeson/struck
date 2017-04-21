@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 template <typename T>
 class Rect
@@ -131,6 +132,23 @@ template <typename T2>
 bool Rect<T>::IsInside(const Rect<T2>& rOther) const
 {
 	return (XMin()>=rOther.XMin()) && (YMin()>=rOther.YMin()) && (XMax()<=rOther.XMax()) && (YMax()<=rOther.YMax());
+}
+
+/**
+ * \brief       Calculate the length of a rectangle's diagonal.
+ * \tparam      T   The type of the calculated length.
+ * \tparam      U   The type of the rectangle for which to calculate diagonal length.
+ * \param[in]   rectangle   The rectangle for which for which to calculate diagonal length.
+ * \return      The length of \a rectangle's diagonal as given by
+ *              \f$ l = \sqrt{width^2 + height^2} \f$
+ * \throws      None
+ */
+template <class T, class U>
+T diagonal_length(const Rect<U>& rectangle) noexcept
+{
+    const auto w = static_cast<T>(rectangle.Width());
+    const auto h = static_cast<T>(rectangle.Height());
+    return std::sqrt(w * w + h * h);
 }
 
 #endif
