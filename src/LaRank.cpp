@@ -27,9 +27,6 @@
 
 #include "LaRank.h"
 
-#include "Config.h"
-#include "Features.h"
-#include "Kernels.h"
 #include "Sample.h"
 #include "Rect.h"
 #include "GraphUtils/GraphUtils.h"
@@ -65,7 +62,7 @@ double LaRank::Evaluate(const Eigen::VectorXd& x, const FloatRect& y) const
 	for (int i = 0; i < (int)m_svs.size(); ++i)
 	{
 		const SupportVector& sv = *m_svs[i];
-		f += sv.b*m_kernel.Eval(x, sv.x->x[sv.y]);
+		f += sv.b * m_kernel.Eval(x, sv.x->x[sv.y]);
 	}
 	return f;
 }

@@ -30,28 +30,25 @@
 
 #include "Rect.h"
 #include "Sample.h"
-
 #include <vector>
 #include <Eigen/Core>
-
 #include <opencv/cv.h>
-
-class Config;
-class Features;
-class Kernel;
+#include "Config.h"
+#include "Features.h"
+#include "Kernels.h"
 
 class LaRank
 {
 public:
 	LaRank(const Config& conf, const Features& features, const Kernel& kernel);
-	~LaRank();
+	virtual ~LaRank();
 
 	virtual void Eval(const MultiSample& x, std::vector<double>& results);
 	virtual void Update(const MultiSample& x, int y);
 
 	virtual void Debug();
 
-private:
+protected:
 
 	struct SupportPattern
 	{
@@ -69,6 +66,7 @@ private:
 		double b;
 		double g;
 		cv::Mat image;
+        float m_fuzziness = 1.0f; ///< The fuzziness factor for use in a fuzzy SVM.
 	};
 
 	const Config& m_config;
@@ -97,12 +95,12 @@ private:
 
 	void SMOStep(int ipos, int ineg);
 	std::pair<int, double> MinGradient(int ind);
-	void ProcessNew(int ind);
+	virtual void ProcessNew(int ind);
 	void Reprocess();
-	void ProcessOld();
+	virtual void ProcessOld();
 	void Optimize();
 
-	int AddSupportVector(SupportPattern* x, int y, double g);
+	virtual int AddSupportVector(SupportPattern* x, int y, double g);
 	void RemoveSupportVector(int ind);
 	void RemoveSupportVectors(int ind1, int ind2);
 	void SwapSupportVectors(int ind1, int ind2);
