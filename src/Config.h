@@ -35,6 +35,12 @@
 
 #define VERBOSE (0)
 
+enum class SvmType
+{
+    larank,
+    fuzzy
+};
+
 class Config
 {
 public:
@@ -79,7 +85,8 @@ public:
 	double							svmC;
 	int								svmBudgetSize;
 	std::vector<FeatureKernelPair>	features;
-	FloatRect                       bounding_box; ///< The bounding box used for tracking.
+	FloatRect                       bounding_box;            ///< The bounding box used for tracking.
+    SvmType                         m_svm = SvmType::larank; ///< The type of SVM to use for tracking.
 
 	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 

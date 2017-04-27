@@ -33,6 +33,15 @@
 
 using namespace std;
 
+SvmType svm_from_string(const std::string& str)
+{
+    if (str == "larank")
+        return SvmType::larank;
+    else if (str == "fuzzy")
+        return SvmType::fuzzy;
+    throw std::invalid_argument(str + " is not a valid type of SVM.");
+}
+
 Config::Config(const std::string& path)
 {
 	SetDefaults();
@@ -65,6 +74,20 @@ Config::Config(const std::string& path)
 		else if (name == "searchRadius") iss >> searchRadius;
 		else if (name == "svmC") iss >> svmC;
 		else if (name == "svmBudgetSize") iss >> svmBudgetSize;
+        else if (name == "svm")
+        {
+            std::string svm_string;
+            iss >> svm_string;
+            try
+            {
+                m_svm = svm_from_string(svm_string);
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "error: " << e.what() << "\n"
+                          << "       defaulting to LaRank\n";
+            }
+        }
 		else if (name == "feature")
 		{
 			string featureName, kernelName;
