@@ -36,16 +36,84 @@
 #include <opencv/highgui.h>
 #include "sift_features.h"
 
+#include "fuzzy_larank.h"
+
 using namespace std;
 using namespace cv;
 
 static const int kLiveBoxWidth = 80;
 static const int kLiveBoxHeight = 80;
 
-void rectangle(Mat& rMat, const FloatRect& rRect, const Scalar& rColour)
+void rectangle(Mat& rMat, const FloatRect& rRect, const Scalar& rColour, int thickness = 1)
 {
 	IntRect r(rRect);
-	rectangle(rMat, Point(r.XMin(), r.YMin()), Point(r.XMax(), r.YMax()), rColour);
+	rectangle(rMat, Point(r.XMin(), r.YMin()), Point(r.XMax(), r.YMax()), rColour, thickness);
+}
+
+namespace struck
+{
+    void write_sample_output(const std::string& sequence_name,
+                             const int frame_number,
+                             const cv::Mat& image,
+                             const FloatRect& bounding_box,
+                             const FloatRect& fuzzy_bounding_box)
+    {
+        // add the bounding boxes to the image
+        cv::Mat result = image.clone();
+        rectangle(result, bounding_box, CV_RGB(255, 0, 0), 1);
+        rectangle(result, fuzzy_bounding_box, CV_RGB(0, 255, 0), 1);
+
+        cv::imwrite(sequence_name + "_" + std::to_string(frame_number) + ".png", result);
+    }
+
+    void write_sample_output(const std::string& sequence_name,
+                             const cv::Mat& image,
+                             const FloatRect& bounding_box,
+                             const std::vector<FloatRect>& samples)
+    {
+        // calculate the length of the image diagonal
+        const auto size = image.size();
+        const auto max_length = std::sqrt(size.width * size.width + size.height * size.height);
+
+        // add the bounding box to the image
+        cv::Mat result = image.clone();
+        rectangle(result, bounding_box, CV_RGB(0, 255, 0));
+
+        // figure out the center point of the bounding box
+        cv::Point center(0.5 * bounding_box.Width()  + bounding_box.XMin(),
+                         0.5 * bounding_box.Height() + bounding_box.YMin());
+
+        // calculate fuzziness values, then rescale to the range [0.1, 1.0]. this is exaggerate the
+        // effect of the fuzziness for visualization purposes.
+        std::vector<float> s_values(samples.size(), 1.0f);
+        for (std::size_t i = 0; i < samples.size(); ++i)
+        {
+            cv::Point p(0.5 * samples[i].Width()  + samples[i].XMin(),
+                        0.5 * samples[i].Height() + samples[i].YMin());
+            const auto distance = std::sqrt(std::pow(p.x - center.x, 2.0f) + std::pow(p.y - center.y, 2.0f));
+            s_values[i] = fuzziness(distance, max_length);
+        }
+        const auto min_s = *std::min_element(s_values.cbegin(), s_values.cend());
+        constexpr float remapped_min_s = 0.3f;
+        std::transform(s_values.begin(), s_values.end(), s_values.begin(),
+                       [min_s, remapped_min_s](const float s)
+                       {
+                           return remapped_min_s + (s - min_s) * (1.0f - remapped_min_s) / (1.0f - min_s);
+                       });
+
+        // add filled circles at the sample points
+        constexpr int filled_circle = -1; // specify to OpenCV to fill the circle
+        for (std::size_t i = 0; i < samples.size(); ++i)
+        {
+            cv::Point p(0.5 * samples[i].Width()  + samples[i].XMin(),
+                        0.5 * samples[i].Height() + samples[i].YMin());
+
+            //cv::circle(result, p, 1, CV_RGB(s_values[i] * 255, 0, 0), filled_circle);
+            cv::circle(result, p, 1, CV_RGB(255, 0, 0), filled_circle);
+        }
+
+        cv::imwrite(sequence_name + ".png", result);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -167,7 +235,7 @@ int main(int argc, char* argv[])
 	bool paused = false;
 	bool doInitialise = false;
 	srand(conf.seed);
-    sift::feature_list sf(conf.bounding_box.Width(), conf.bounding_box.Height());
+    //sift::feature_list sf(conf.bounding_box.Width(), conf.bounding_box.Height());
 	for (int frameInd = startFrame; frameInd <= endFrame; ++frameInd)
 	{
 		Mat frame;
@@ -182,7 +250,15 @@ int main(int argc, char* argv[])
 			{
 				if (tracker.IsInitialised())
 				{
-					tracker.Reset();
+                    if (conf.m_svm == SvmType::larank)
+                        tracker.Reset<LaRank>();
+                    else if (conf.m_svm == SvmType::fuzzy)
+                        tracker.Reset<struck::fuzzy_larank>();
+                    else
+                    {
+                        std::cerr << "error: the configuration SVM type is invalid\n";
+                        return EXIT_FAILURE;
+                    }
 				}
 				else
 				{
@@ -223,31 +299,31 @@ int main(int argc, char* argv[])
 
 		if (tracker.IsInitialised())
 		{
-            if (frameInd == startFrame)
-            {
-                cv::Rect bb(conf.bounding_box.XMin(), conf.bounding_box.YMin(), conf.bounding_box.Width(), conf.bounding_box.Height());
-                //cv::Mat first_frame = Mat(frame, bb).clone();
-                cv::Mat first_frame;
-                cv::cvtColor(Mat(frame, bb), first_frame, cv::COLOR_GRAY2RGB);
-
-                //auto first_frame = frame.clone();
-
-                sf.evaluate(first_frame);
-                std::ofstream sf_file("sift.txt");
-                if (sf_file)
-                    sf_file << sf;
-
-                const auto list = sf.list();
-                for (const auto& feature : list)
-                {
-                    cv::circle(first_frame,
-                               cv::Point(feature.keypoint().x(), feature.keypoint().y()),
-                               feature.keypoint().scale(),
-                               Scalar(0, 0, 255, 255));
-                }
-
-                cv::imwrite((conf.sequenceName + ".png").c_str(), first_frame);
-            }
+//            if (frameInd == startFrame)
+//            {
+//                cv::Rect bb(conf.bounding_box.XMin(), conf.bounding_box.YMin(), conf.bounding_box.Width(), conf.bounding_box.Height());
+//                //cv::Mat first_frame = Mat(frame, bb).clone();
+//                cv::Mat first_frame;
+//                cv::cvtColor(Mat(frame, bb), first_frame, cv::COLOR_GRAY2RGB);
+//
+//                //auto first_frame = frame.clone();
+//
+//                sf.evaluate(first_frame);
+//                std::ofstream sf_file("sift.txt");
+//                if (sf_file)
+//                    sf_file << sf;
+//
+//                const auto list = sf.list();
+//                for (const auto& feature : list)
+//                {
+//                    cv::circle(first_frame,
+//                               cv::Point(feature.keypoint().x(), feature.keypoint().y()),
+//                               feature.keypoint().scale(),
+//                               Scalar(0, 0, 255, 255));
+//                }
+//
+//                cv::imwrite((conf.sequenceName + ".png").c_str(), first_frame);
+//            }
 
 			tracker.Track(frame);
 
@@ -261,7 +337,11 @@ int main(int argc, char* argv[])
                 cout.flush();
             }
 
-			rectangle(result, tracker.GetBB(), CV_RGB(0, 255, 0));
+            //if (frameInd == startFrame + 23)
+                //struck::write_sample_output(conf.sequenceName, frameInd, result, tracker.GetBB(), fuzzy_tracker.GetBB());
+            //struck::write_sample_output(conf.sequenceName, result, tracker.GetBB(), tracker.update_samples());
+			//rectangle(result, tracker.GetBB(), CV_RGB(0, 255, 0));
+            //cv::imwrite(conf.sequenceName + ".png", result);
 
 			if (outFile)
 			{
