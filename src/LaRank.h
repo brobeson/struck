@@ -108,7 +108,7 @@ protected:
 	void BudgetMaintenance();
 	void BudgetMaintenanceRemove();
 
-	double Evaluate(const Eigen::VectorXd& x, const FloatRect& y) const;
+	virtual double Evaluate(const Eigen::VectorXd& x, const FloatRect& y) const;
 	void UpdateDebugImage();
 };
 
