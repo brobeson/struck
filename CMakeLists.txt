@@ -38,4 +38,7 @@ configure_file("run_experiments.sh" "bin/run_experiments.sh" @ONLY)
 
 # build a tool to automate data analysis
 add_subdirectory(analyze)
+
+# build unit tests
+enable_testing()
 add_subdirectory(tests)
