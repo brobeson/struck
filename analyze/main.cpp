@@ -145,7 +145,7 @@ namespace analyze
         try
         {
             // load the struck results for the sequence
-            auto results = load_results(sequence + ".csv");
+            auto results = load_results(sequence + ".boxes");
 
             // load the ground truth for the sequence
             std::string ground_truth_path("/home/brendan/Videos/struck_data/");

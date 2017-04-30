@@ -242,86 +242,99 @@ void LaRank::ProcessNew(int ind)
 
 void LaRank::ProcessOld()
 {
-	if (m_sps.size() == 0) return;
+    if (m_config.m_processOld)
+    {
+        if (m_sps.size() == 0) return;
 
-	// choose pattern to process
-	int ind = rand() % m_sps.size();
+        // choose pattern to process
+        int ind = rand() % m_sps.size();
 
-	// find existing sv with largest grad and nonzero beta
-	int ip = -1;
-	double maxGrad = -DBL_MAX;
-	for (int i = 0; i < (int)m_svs.size(); ++i)
-	{
-		if (m_svs[i]->x != m_sps[ind]) continue;
+        // find existing sv with largest grad and nonzero beta
+        int ip = -1;
+        double maxGrad = -DBL_MAX;
+        for (int i = 0; i < (int)m_svs.size(); ++i)
+        {
+            if (m_svs[i]->x != m_sps[ind]) continue;
 
-		const SupportVector* svi = m_svs[i];
-		if (svi->g > maxGrad && svi->b < m_C*(int)(svi->y == m_sps[ind]->y))
-		{
-			ip = i;
-			maxGrad = svi->g;
-		}
-	}
-	assert(ip != -1);
-	if (ip == -1) return;
+            const SupportVector* svi = m_svs[i];
+            if (svi->g > maxGrad && svi->b < m_C*(int)(svi->y == m_sps[ind]->y))
+            {
+                ip = i;
+                maxGrad = svi->g;
+            }
+        }
+        assert(ip != -1);
+        if (ip == -1) return;
 
-	// find potentially new sv with smallest grad
-	pair<int, double> minGrad = MinGradient(ind);
-	int in = -1;
-	for (int i = 0; i < (int)m_svs.size(); ++i)
-	{
-		if (m_svs[i]->x != m_sps[ind]) continue;
+        // find potentially new sv with smallest grad
+        pair<int, double> minGrad = MinGradient(ind);
+        int in = -1;
+        for (int i = 0; i < (int)m_svs.size(); ++i)
+        {
+            if (m_svs[i]->x != m_sps[ind]) continue;
 
-		if (m_svs[i]->y == minGrad.first)
-		{
-			in = i;
-			break;
-		}
-	}
-	if (in == -1)
-	{
-		// add new sv
-		in = AddSupportVector(m_sps[ind], minGrad.first, minGrad.second);
-	}
+            if (m_svs[i]->y == minGrad.first)
+            {
+                in = i;
+                break;
+            }
+        }
+        if (in == -1)
+        {
+            // add new sv
+            in = AddSupportVector(m_sps[ind], minGrad.first, minGrad.second);
+        }
 
-	SMOStep(ip, in);
+        SMOStep(ip, in);
+    }
 }
 
 void LaRank::Optimize()
 {
 	if (m_sps.size() == 0) return;
 
-	// choose pattern to optimize
-	int ind = rand() % m_sps.size();
+	// choose pattern to optimize. if optimize all is enabled, set the start and end indices to the
+    // range of all the vectors. otherwise, set the start index to a random vector, and set the end
+    // index to the same + 1. (+1 so the for loop works correctly.)
+    const size_t startIndex = m_config.m_optimizeAll ?
+                              0 :
+                              rand() % m_sps.size();
+    const size_t endIndex = m_config.m_optimizeAll ?
+                            m_sps.size() :
+                            startIndex + 1;
 
-	int ip = -1;
-	int in = -1;
-	double maxGrad = -DBL_MAX;
-	double minGrad = DBL_MAX;
-	for (int i = 0; i < (int)m_svs.size(); ++i)
-	{
-		if (m_svs[i]->x != m_sps[ind]) continue;
+    for (auto ind = startIndex; ind < endIndex; ++ind)
+    {
+        int ip = -1;
+        int in = -1;
+        double maxGrad = -DBL_MAX;
+        double minGrad = DBL_MAX;
+        for (int i = 0; i < (int)m_svs.size(); ++i)
+        {
+            if (m_svs[i]->x != m_sps[ind]) continue;
 
-		const SupportVector* svi = m_svs[i];
-		if (svi->g > maxGrad && svi->b < m_C*(int)(svi->y == m_sps[ind]->y))
-		{
-			ip = i;
-			maxGrad = svi->g;
-		}
-		if (svi->g < minGrad)
-		{
-			in = i;
-			minGrad = svi->g;
-		}
-	}
-	assert(ip != -1 && in != -1);
-	if (ip == -1 || in == -1)
-	{
-		// this shouldn't happen
-		cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		return;
-	}
+            const SupportVector* svi = m_svs[i];
+            if (svi->g > maxGrad && svi->b < m_C*(int)(svi->y == m_sps[ind]->y))
+            {
+                ip = i;
+                maxGrad = svi->g;
+            }
+            if (svi->g < minGrad)
+            {
+                in = i;
+                minGrad = svi->g;
+            }
+        }
+        assert(ip != -1 && in != -1);
+        if (ip == -1 || in == -1)
+        {
+            // this shouldn't happen
+            std::cerr << "impossible error encountered in " << __func__ << ": either ip or in is -1\n";
+            return;
+        }
 
-	SMOStep(ip, in);
+        SMOStep(ip, in);
+    }
 }
 
 int LaRank::AddSupportVector(SupportPattern* x, int y, double g)

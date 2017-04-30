@@ -46,3 +46,11 @@ svmBudgetSize = 100
 feature = haar gaussian 0.2
 #feature = raw gaussian 0.1
 #feature = histogram intersection
+
+# enable or disable the process new update step. use "on" to enable the step, or "off" to disable
+# it. the default is "on".
+processOld = on
+
+# enable of disable optimizing all the existing support vectors. use "on" to enable this, or "off"
+# to disable (to optimize one random vector). the defaulut is "off".
+optimizeAll = off

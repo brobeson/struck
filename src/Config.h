@@ -87,6 +87,8 @@ public:
 	std::vector<FeatureKernelPair>	features;
 	FloatRect                       bounding_box;            ///< The bounding box used for tracking.
     SvmType                         m_svm = SvmType::larank; ///< The type of SVM to use for tracking.
+    bool                            m_processOld = true;     ///< True -> run the process old step.
+    bool                            m_optimizeAll = false;   ///< True -> run optimize step on all support vectors
 
 	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 

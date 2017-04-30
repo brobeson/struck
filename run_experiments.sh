@@ -14,6 +14,8 @@ no_color='\033[0m'
 
 # set up the struck configuration options for all sequences
 config_file="config.txt"
+sed --in-place 's/#\?processOld.*$/processOld = off/' ${config_file}
+sed --in-place 's/#\?optimizeAll.*$/optimizeAll = on/' ${config_file}
 sed --in-place 's/#\?quietMode.*$/quietMode = 1/' ${config_file}
 sed --in-place 's/#\?debugMode.*$/debugMode = 0/' ${config_file}
 sed --in-place 's|#\?sequenceBasePath.*$|sequenceBasePath = /home/brendan/Videos/struck_data|' ${config_file}
@@ -27,7 +29,7 @@ for s in ${sequences[@]}
 do
     echo "---------------------------------------------------"
     echo "tracking ${s}..."
-    sed --in-place 's/#\?resultsPath.*$/resultsPath = '${s}'.csv/' ${config_file}
+    sed --in-place 's/#\?resultsPath.*$/resultsPath = '${s}'.boxes/' ${config_file}
     sed --in-place 's/#\?sequenceName.*$/sequenceName = '${s}'/' ${config_file}
     ./struck config.txt
     if [[ ! $? -eq 0 ]]
@@ -38,3 +40,5 @@ do
     fi
     echo
 done
+
+grep "average" *ious | cut --delimiter=: --fields=3

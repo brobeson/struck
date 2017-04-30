@@ -74,6 +74,24 @@ Config::Config(const std::string& path)
 		else if (name == "searchRadius") iss >> searchRadius;
 		else if (name == "svmC") iss >> svmC;
 		else if (name == "svmBudgetSize") iss >> svmBudgetSize;
+        else if (name == "processOld")
+        {
+            std::string on;
+            iss >> on;
+            if (on == "off")
+                m_processOld = false;
+            else if (on != "on")
+                std::cerr << "error reading processOld: '" << on << "' is not a valid option. defaulting to on\n";
+        }
+        else if (name == "optimizeAll")
+        {
+            std::string on;
+            iss >> on;
+            if (on == "on")
+                m_optimizeAll = true;
+            else if (on != "off")
+                std::cerr << "error reading optimizeAll: '" << on << "' is not a valid option. defaulting to off\n";
+        }
         else if (name == "svm")
         {
             std::string svm_string;
@@ -199,6 +217,9 @@ ostream& operator<< (ostream& out, const Config& conf)
 	out << "  searchRadius       = " << conf.searchRadius << endl;
 	out << "  svmC               = " << conf.svmC << endl;
 	out << "  svmBudgetSize      = " << conf.svmBudgetSize << endl;
+    out << "  svmType            = " << (conf.m_svm == SvmType::fuzzy ? "fuzzy" : "larank") << std::endl
+        << "  processOld         = " << (conf.m_processOld ? "on" : "off") << std::endl
+        << "  optimizeAll        = " << (conf.m_optimizeAll ? "on" : "off") << std::endl;
 
 	for (int i = 0; i < (int)conf.features.size(); ++i)
 	{
