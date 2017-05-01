@@ -60,3 +60,9 @@ optimizeAll = off
 # distance  Base the loss on the potential bounding box's distance from the current bounding box.
 # the default is "iou".
 lossType = iou
+
+# select the type of loss function manipulator to use. acceptable values are:
+# identity      Use an identity function:  f(x) = x
+# smoothStep    Use a smoothstep function: f(x) = 3x^2 - 2x^3
+# the default is "identity"
+manipulator = identity

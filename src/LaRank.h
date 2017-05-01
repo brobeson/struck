@@ -38,6 +38,7 @@
 #include "Features.h"
 #include "Kernels.h"
 #include "loss_function.h"
+#include "loss_manipulator.h"
 
 class LaRank
 {
@@ -77,6 +78,9 @@ protected:
 
     /// The loss function to use with this SVM.
     std::shared_ptr<struck::loss_function> m_pLoss = nullptr;
+
+    /// The loss function manipulator to use with this SVM.
+    std::shared_ptr<struck::loss_manipulator> m_pManipulator = nullptr;
 
 	std::vector<SupportPattern*> m_sps;
 	std::vector<SupportVector*> m_svs;

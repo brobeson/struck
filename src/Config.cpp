@@ -101,6 +101,15 @@ Config::Config(const std::string& path)
             else if (loss != "iou")
                 std::cerr << "error: '" << loss << "' is not a valid type of loss function. defaulting to iou.\n";
         }
+        else if (name == "manipulator")
+        {
+            std::string loss;
+            iss >> loss;
+            if (loss == "smoothStep")
+                m_manipulator = LossManipulatorType::SMOOTH_STEP;
+            else if (loss != "identity")
+                std::cerr << "error: '" << loss << "' is not a valid type of loss manipulator. defaulting to identity.\n";
+        }
         else if (name == "svm")
         {
             std::string svm_string;
@@ -228,6 +237,7 @@ ostream& operator<< (ostream& out, const Config& conf)
 	out << "  svmBudgetSize      = " << conf.svmBudgetSize << endl;
     out << "  svmType            = " << (conf.m_svm == SvmType::fuzzy ? "fuzzy" : "larank") << std::endl
         << "  loss               = " << (conf.m_loss == LossFunctionType::IOU ? "iou" : "distance") << std::endl
+        << "  manipulator        = " << (conf.m_manipulator == LossManipulatorType::IDENTITY ? "identity" : "smoothStep") << std::endl
         << "  processOld         = " << (conf.m_processOld ? "on" : "off") << std::endl
         << "  optimizeAll        = " << (conf.m_optimizeAll ? "on" : "off") << std::endl;
 

@@ -15,6 +15,7 @@ no_color='\033[0m'
 # set up the struck configuration options for all sequences
 config_file="config.txt"
 sed --in-place 's/#\?loss.*$/loss = distance/' ${config_file}
+sed --in-place 's/#\?manipulator.*$/manipulator = smoothStep/' ${config_file}
 sed --in-place 's/#\?processOld.*$/processOld = off/' ${config_file}
 sed --in-place 's/#\?optimizeAll.*$/optimizeAll = on/' ${config_file}
 sed --in-place 's/#\?quietMode.*$/quietMode = 1/' ${config_file}

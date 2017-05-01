@@ -49,6 +49,13 @@ enum class LossFunctionType
     DISTANCE ///< A loss function based on distance: \f$ 1 - \frac{\|\mathbf{y}\|}{\|\mathbf{y}_max\|} \f$.
 };
 
+/// The type of loss manipulators available
+enum class LossManipulatorType
+{
+    IDENTITY,
+    SMOOTH_STEP
+};
+
 class Config
 {
 public:
@@ -100,6 +107,9 @@ public:
 
     /// The type of loss function to use.
     LossFunctionType                m_loss = LossFunctionType::IOU; 
+
+    /// The type of loss function manipulator to use.
+    LossManipulatorType             m_manipulator = LossManipulatorType::IDENTITY;
 
 	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 
