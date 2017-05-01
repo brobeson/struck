@@ -187,15 +187,16 @@ namespace struck
 
             /**
              * \brief       Evaluate IoU loss for a pair of bounding boxes.
+             * \param[in]   current     The current bounding box of the target.
              * \param[in]   potential   The potential new bounding box.
              * \return      The ratio of the bounding box's translation distance to the maximum
              *              distance.
              * \throws      None
              */
-            virtual float evaluate(const FloatRect& /*current*/, const FloatRect& potential) const noexcept override
+            virtual float evaluate(const FloatRect& current, const FloatRect& potential) const noexcept override
             {
-                auto d = std::sqrt(potential.XMin() * potential.XMin() +
-                                   potential.YMin() * potential.YMin());
+                auto d = std::sqrt(std::pow(potential.XMin() - current.XMin(), 2.0f) +
+                                   std::pow(potential.YMin() - current.YMin(), 2.0f));
                 return d / m_max_distance;
             }
 

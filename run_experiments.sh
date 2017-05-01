@@ -43,4 +43,4 @@ do
     echo
 done
 
-grep "average" *ious | cut --delimiter=: --fields=3
+grep "average" *ious | cut --delimiter=: --fields=1,3
