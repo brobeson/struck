@@ -92,6 +92,15 @@ Config::Config(const std::string& path)
             else if (on != "off")
                 std::cerr << "error reading optimizeAll: '" << on << "' is not a valid option. defaulting to off\n";
         }
+        else if (name == "loss")
+        {
+            std::string loss;
+            iss >> loss;
+            if (loss == "distance")
+                m_loss = LossFunctionType::DISTANCE;
+            else if (loss != "iou")
+                std::cerr << "error: '" << loss << "' is not a valid type of loss function. defaulting to iou.\n";
+        }
         else if (name == "svm")
         {
             std::string svm_string;
@@ -218,6 +227,7 @@ ostream& operator<< (ostream& out, const Config& conf)
 	out << "  svmC               = " << conf.svmC << endl;
 	out << "  svmBudgetSize      = " << conf.svmBudgetSize << endl;
     out << "  svmType            = " << (conf.m_svm == SvmType::fuzzy ? "fuzzy" : "larank") << std::endl
+        << "  loss               = " << (conf.m_loss == LossFunctionType::IOU ? "iou" : "distance") << std::endl
         << "  processOld         = " << (conf.m_processOld ? "on" : "off") << std::endl
         << "  optimizeAll        = " << (conf.m_optimizeAll ? "on" : "off") << std::endl;
 

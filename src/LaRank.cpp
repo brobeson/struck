@@ -41,6 +41,29 @@ using namespace Eigen;
 static const int kMaxSVs = 2000; // TODO (only used when no budget)
 
 
+namespace struck
+{
+    /**
+     * \brief       Make the loss function to use in the SVM solver.
+     * \param[in]   configuration   The application configuration from which to read the loss
+     *                              function type.
+     * \return      A pointer to the constructed loss function.
+     * \throws      None
+     */
+    std::shared_ptr<struck::loss_function> make_loss_function(const Config& configuration) noexcept
+    {
+        if (configuration.m_loss == LossFunctionType::DISTANCE)
+        {
+            const float max = std::sqrt(configuration.frameWidth  * configuration.frameWidth +
+                                        configuration.frameHeight * configuration.frameHeight);
+            return std::make_shared<distance_loss>(max);
+        }
+
+        // default is IOU
+        return std::make_shared<iou_loss>();
+    }
+}
+
 LaRank::LaRank(const Config& conf, const Features& features, const Kernel& kernel) :
 	m_config(conf),
 	m_features(features),
@@ -50,6 +73,8 @@ LaRank::LaRank(const Config& conf, const Features& features, const Kernel& kerne
 	int N = conf.svmBudgetSize > 0 ? conf.svmBudgetSize+2 : kMaxSVs;
 	m_K = MatrixXd::Zero(N, N);
 	m_debugImage = Mat(800, 600, CV_8UC3);
+
+    m_pLoss = struck::make_loss_function(m_config);
 }
 
 LaRank::~LaRank()
@@ -147,7 +172,7 @@ double LaRank::ComputeDual() const
 	for (int i = 0; i < (int)m_svs.size(); ++i)
 	{
 		const SupportVector* sv = m_svs[i];
-		d -= sv->b*Loss(sv->x->yv[sv->y], sv->x->yv[sv->x->y]);
+		d -= sv->b * m_pLoss->evaluate(sv->x->yv[sv->y], sv->x->yv[sv->x->y]);
 		for (int j = 0; j < (int)m_svs.size(); ++j)
 		{
 			d -= 0.5*sv->b*m_svs[j]->b*m_K(i,j);
@@ -219,7 +244,7 @@ pair<int, double> LaRank::MinGradient(int ind)
 	pair<int, double> minGrad(-1, DBL_MAX);
 	for (int i = 0; i < (int)sp->yv.size(); ++i)
 	{
-		double grad = -Loss(sp->yv[i], sp->yv[sp->y]) - Evaluate(sp->x[i], sp->yv[i]);
+		double grad = -m_pLoss->evaluate(sp->yv[i], sp->yv[sp->y]) - Evaluate(sp->x[i], sp->yv[i]);
 		if (grad < minGrad.second)
 		{
 			minGrad.first = i;
@@ -463,7 +488,7 @@ void LaRank::BudgetMaintenanceRemove()
 	for (int i = 0; i < (int)m_svs.size(); ++i)
 	{
 		SupportVector& svi = *m_svs[i];
-		svi.g = -Loss(svi.x->yv[svi.y],svi.x->yv[svi.x->y]) - Evaluate(svi.x->x[svi.y], svi.x->yv[svi.y]);
+		svi.g = -m_pLoss->evaluate(svi.x->yv[svi.y],svi.x->yv[svi.x->y]) - Evaluate(svi.x->x[svi.y], svi.x->yv[svi.y]);
 	}
 }
 

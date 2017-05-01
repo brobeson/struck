@@ -30,12 +30,14 @@
 
 #include "Rect.h"
 #include "Sample.h"
+#include <memory>
 #include <vector>
 #include <Eigen/Core>
 #include <opencv/cv.h>
 #include "Config.h"
 #include "Features.h"
 #include "Kernels.h"
+#include "loss_function.h"
 
 class LaRank
 {
@@ -72,6 +74,9 @@ protected:
 	const Config& m_config;
 	const Features& m_features;
 	const Kernel& m_kernel;
+
+    /// The loss function to use with this SVM.
+    std::shared_ptr<struck::loss_function> m_pLoss = nullptr;
 
 	std::vector<SupportPattern*> m_sps;
 	std::vector<SupportVector*> m_svs;

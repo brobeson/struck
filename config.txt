@@ -54,3 +54,9 @@ processOld = on
 # enable of disable optimizing all the existing support vectors. use "on" to enable this, or "off"
 # to disable (to optimize one random vector). the defaulut is "off".
 optimizeAll = off
+
+# select the type of loss function to use. acceptable values are:
+# iou       Base the loss on the potential bounding box's overlap with the current bounding box.
+# distance  Base the loss on the potential bounding box's distance from the current bounding box.
+# the default is "iou".
+lossType = iou

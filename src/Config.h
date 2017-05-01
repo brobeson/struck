@@ -35,10 +35,18 @@
 
 #define VERBOSE (0)
 
+/// The types of support vector machines available.
 enum class SvmType
 {
-    larank,
-    fuzzy
+    larank, ///< LaRank structured output SVM.
+    fuzzy   ///< Fuzzy (weighted) LaRank structured output SVM.
+};
+
+/// The type of loss functions available.
+enum class LossFunctionType
+{
+    IOU,     ///< The default function: \f$ 1 - s_{\mathbf{p}_t}^o(\mathbf{y}, \mathbf{\bar{y}}) \f$.
+    DISTANCE ///< A loss function based on distance: \f$ 1 - \frac{\|\mathbf{y}\|}{\|\mathbf{y}_max\|} \f$.
 };
 
 class Config
@@ -89,6 +97,9 @@ public:
     SvmType                         m_svm = SvmType::larank; ///< The type of SVM to use for tracking.
     bool                            m_processOld = true;     ///< True -> run the process old step.
     bool                            m_optimizeAll = false;   ///< True -> run optimize step on all support vectors
+
+    /// The type of loss function to use.
+    LossFunctionType                m_loss = LossFunctionType::IOU; 
 
 	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 
