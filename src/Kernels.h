@@ -1,28 +1,28 @@
-/* 
+/*
  * Struck: Structured Output Tracking with Kernels
- * 
+ *
  * Code to accompany the paper:
  *   Struck: Structured Output Tracking with Kernels
  *   Sam Hare, Amir Saffari, Philip H. S. Torr
  *   International Conference on Computer Vision (ICCV), 2011
- * 
+ *
  * Copyright (C) 2011 Sam Hare, Oxford Brookes University, Oxford, UK
- * 
+ *
  * This file is part of Struck.
- * 
+ *
  * Struck is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Struck is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Struck.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 #ifndef KERNELS_H
@@ -46,7 +46,7 @@ public:
 	{
 		return x1.dot(x2);
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x) const
 	{
 		return x.squaredNorm();
@@ -61,7 +61,7 @@ public:
 	{
 		return exp(-m_sigma*(x1-x2).squaredNorm());
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x) const
 	{
 		return 1.0;
@@ -78,7 +78,7 @@ public:
 	{
 		return x1.array().min(x2.array()).sum();
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x) const
 	{
 		return x.sum();
@@ -99,7 +99,7 @@ public:
 		}
 		return 1.0 - result;
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x) const
 	{
 		return 1.0;
@@ -116,7 +116,7 @@ public:
 		m_counts(featureCounts)
 	{
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2) const
 	{
 		double sum = 0.0;
@@ -127,9 +127,9 @@ public:
 			sum += m_norm*m_kernels[i]->Eval(x1.segment(start, c), x2.segment(start, c));
 			start += c;
 		}
-		return sum;	
+		return sum;
 	}
-	
+
 	inline double Eval(const Eigen::VectorXd& x) const
 	{
 		double sum = 0.0;
@@ -140,15 +140,15 @@ public:
 			sum += m_norm*m_kernels[i]->Eval(x.segment(start, c));
 			start += c;
 		}
-		return sum;	
+		return sum;
 	}
-	
+
 private:
 	int m_n;
 	double m_norm;
 	std::vector<Kernel*> m_kernels;
-	std::vector<int> m_counts;	
-	
+	std::vector<int> m_counts;
+
 };
 
 #endif
