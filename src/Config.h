@@ -37,53 +37,53 @@
 class Config
 {
 public:
-	Config() { SetDefaults(); }
-	Config(const std::string& path);
+    Config() { SetDefaults(); }
+    Config(const std::string& path);
 
-	enum FeatureType
-	{
-		kFeatureTypeHaar,
-		kFeatureTypeRaw,
-		kFeatureTypeHistogram
-	};
+    enum FeatureType
+    {
+        kFeatureTypeHaar,
+        kFeatureTypeRaw,
+        kFeatureTypeHistogram
+    };
 
-	enum KernelType
-	{
-		kKernelTypeLinear,
-		kKernelTypeGaussian,
-		kKernelTypeIntersection,
-		kKernelTypeChi2
-	};
+    enum KernelType
+    {
+        kKernelTypeLinear,
+        kKernelTypeGaussian,
+        kKernelTypeIntersection,
+        kKernelTypeChi2
+    };
 
-	struct FeatureKernelPair
-	{
-		FeatureType feature;
-		KernelType kernel;
-		std::vector<double> params;
-	};
+    struct FeatureKernelPair
+    {
+        FeatureType feature;
+        KernelType kernel;
+        std::vector<double> params;
+    };
 
-	bool							quietMode;
-	bool							debugMode;
+    bool                            quietMode;
+    bool                            debugMode;
 
-	std::string						sequenceBasePath;
-	std::string						sequenceName;
-	std::string						resultsPath;
+    std::string                     sequenceBasePath;
+    std::string                     sequenceName;
+    std::string                     resultsPath;
 
-	int								frameWidth;
-	int								frameHeight;
+    int                             frameWidth;
+    int                             frameHeight;
 
-	int								seed;
-	int								searchRadius;
-	double							svmC;
-	int								svmBudgetSize;
-	std::vector<FeatureKernelPair>	features;
+    int                             seed;
+    int                             searchRadius;
+    double                          svmC;
+    int                             svmBudgetSize;
+    std::vector<FeatureKernelPair>  features;
 
-	friend std::ostream& operator<< (std::ostream& out, const Config& conf);
+    friend std::ostream& operator<< (std::ostream& out, const Config& conf);
 
 private:
-	void SetDefaults();
-	static std::string FeatureName(FeatureType f);
-	static std::string KernelName(KernelType k);
+    void SetDefaults();
+    static std::string FeatureName(FeatureType f);
+    static std::string KernelName(KernelType k);
 };
 
 #endif
