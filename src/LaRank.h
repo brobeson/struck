@@ -43,38 +43,38 @@
 class LaRank
 {
 public:
-	LaRank(const Config& conf, const Features& features, const Kernel& kernel);
-	virtual ~LaRank();
+    LaRank(const Config& conf, const Features& features, const Kernel& kernel);
+    virtual ~LaRank();
 
-	virtual void Eval(const MultiSample& x, std::vector<double>& results);
-	virtual void Update(const MultiSample& x, int y);
+    virtual void Eval(const MultiSample& x, std::vector<double>& results);
+    virtual void Update(const MultiSample& x, int y);
 
-	virtual void Debug();
+    virtual void Debug();
 
 protected:
 
-	struct SupportPattern
-	{
-		std::vector<Eigen::VectorXd> x;
-		std::vector<FloatRect> yv;
-		std::vector<cv::Mat> images;
-		int y;
-		int refCount;
-	};
+    struct SupportPattern
+    {
+        std::vector<Eigen::VectorXd> x;
+        std::vector<FloatRect> yv;
+        std::vector<cv::Mat> images;
+        int y;
+        int refCount;
+    };
 
-	struct SupportVector
-	{
-		SupportPattern* x;
-		int y;
-		double b;
-		double g;
-		cv::Mat image;
+    struct SupportVector
+    {
+        SupportPattern* x;
+        int y;
+        double b;
+        double g;
+        cv::Mat image;
         float m_fuzziness = 1.0f; ///< The fuzziness factor for use in a fuzzy SVM.
-	};
+    };
 
-	const Config& m_config;
-	const Features& m_features;
-	const Kernel& m_kernel;
+    const Config& m_config;
+    const Features& m_features;
+    const Kernel& m_kernel;
 
     /// The loss function to use with this SVM.
     std::shared_ptr<struck::loss_function> m_pLoss = nullptr;
@@ -82,43 +82,43 @@ protected:
     /// The loss function manipulator to use with this SVM.
     std::shared_ptr<struck::loss_manipulator> m_pManipulator = nullptr;
 
-	std::vector<SupportPattern*> m_sps;
-	std::vector<SupportVector*> m_svs;
+    std::vector<SupportPattern*> m_sps;
+    std::vector<SupportVector*> m_svs;
 
-	cv::Mat m_debugImage;
+    cv::Mat m_debugImage;
 
-	double m_C;
-	Eigen::MatrixXd m_K;
+    double m_C;
+    Eigen::MatrixXd m_K;
 
-	inline double Loss(const FloatRect& y1, const FloatRect& y2) const
-	{
-		// overlap loss
-		return 1.0-y1.Overlap(y2);
-		// squared distance loss
-		//double dx = y1.XMin()-y2.XMin();
-		//double dy = y1.YMin()-y2.YMin();
-		//return dx*dx+dy*dy;
-	}
+    inline double Loss(const FloatRect& y1, const FloatRect& y2) const
+    {
+        // overlap loss
+        return 1.0-y1.Overlap(y2);
+        // squared distance loss
+        //double dx = y1.XMin()-y2.XMin();
+        //double dy = y1.YMin()-y2.YMin();
+        //return dx*dx+dy*dy;
+    }
 
-	double ComputeDual() const;
+    double ComputeDual() const;
 
-	void SMOStep(int ipos, int ineg);
-	std::pair<int, double> MinGradient(int ind);
-	virtual void ProcessNew(int ind);
-	void Reprocess();
-	virtual void ProcessOld();
-	void Optimize();
+    void SMOStep(int ipos, int ineg);
+    std::pair<int, double> MinGradient(int ind);
+    virtual void ProcessNew(int ind);
+    void Reprocess();
+    virtual void ProcessOld();
+    void Optimize();
 
-	virtual int AddSupportVector(SupportPattern* x, int y, double g);
-	void RemoveSupportVector(int ind);
-	void RemoveSupportVectors(int ind1, int ind2);
-	void SwapSupportVectors(int ind1, int ind2);
+    virtual int AddSupportVector(SupportPattern* x, int y, double g);
+    void RemoveSupportVector(int ind);
+    void RemoveSupportVectors(int ind1, int ind2);
+    void SwapSupportVectors(int ind1, int ind2);
 
-	void BudgetMaintenance();
-	void BudgetMaintenanceRemove();
+    void BudgetMaintenance();
+    void BudgetMaintenanceRemove();
 
-	virtual double Evaluate(const Eigen::VectorXd& x, const FloatRect& y) const;
-	void UpdateDebugImage();
+    virtual double Evaluate(const Eigen::VectorXd& x, const FloatRect& y) const;
+    void UpdateDebugImage();
 };
 
 #endif
