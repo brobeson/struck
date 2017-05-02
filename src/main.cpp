@@ -35,7 +35,6 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include "sift_features.h"
-
 #include "fuzzy_larank.h"
 
 using namespace std;
@@ -378,7 +377,6 @@ int main(int argc, char* argv[])
     }
 
     std::cout << std::endl;
-
     if (outFile.is_open())
     {
         outFile.close();

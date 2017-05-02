@@ -88,18 +88,18 @@ public:
     bool                            quietMode;
     bool                            debugMode;
 
-    std::string                        sequenceBasePath;
-    std::string                        sequenceName;
-    std::string                        resultsPath;
+    std::string                     sequenceBasePath;
+    std::string                     sequenceName;
+    std::string                     resultsPath;
 
-    int                                frameWidth;
-    int                                frameHeight;
+    int                             frameWidth;
+    int                             frameHeight;
 
-    int                                seed;
-    int                                searchRadius;
-    double                            svmC;
-    int                                svmBudgetSize;
-    std::vector<FeatureKernelPair>    features;
+    int                             seed;
+    int                             searchRadius;
+    double                          svmC;
+    int                             svmBudgetSize;
+    std::vector<FeatureKernelPair>  features;
     FloatRect                       bounding_box;            ///< The bounding box used for tracking.
     SvmType                         m_svm = SvmType::larank; ///< The type of SVM to use for tracking.
     bool                            m_processOld = true;     ///< True -> run the process old step.
