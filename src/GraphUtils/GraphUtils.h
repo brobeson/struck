@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Graphing functions for OpenCV.	Part of "ImageUtils.cpp", a set of handy utility functions for dealing with images in OpenCV.
+// Graphing functions for OpenCV.    Part of "ImageUtils.cpp", a set of handy utility functions for dealing with images in OpenCV.
 // by Shervin Emami (http://www.shervinemami.co.cc/) on 20th May, 2010.
 //------------------------------------------------------------------------------
 
@@ -14,9 +14,9 @@ extern "C"
 // Allow 'bool' variables in both C and C++ code.
 #ifdef __cplusplus
 #else
-	typedef int bool;
-	#define true (1)
-	#define false (0)
+    typedef int bool;
+    #define true (1)
+    #define false (0)
 #endif
 
 #ifdef __cplusplus

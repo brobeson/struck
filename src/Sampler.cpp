@@ -35,53 +35,53 @@ using namespace std;
 
 vector<FloatRect> Sampler::RadialSamples(FloatRect centre, int radius, int nr, int nt)
 {
-	vector<FloatRect> samples;
+    vector<FloatRect> samples;
 
-	FloatRect s(centre);
-	float rstep = (float)radius/nr;
-	float tstep = 2*(float)M_PI/nt;
-	samples.push_back(centre);
+    FloatRect s(centre);
+    float rstep = (float)radius/nr;
+    float tstep = 2*(float)M_PI/nt;
+    samples.push_back(centre);
 
-	for (int ir = 1; ir <= nr; ++ir)
-	{
-		float phase = (ir % 2)*tstep/2;
-		for (int it = 0; it < nt; ++it)
-		{
-			float dx = ir*rstep*cosf(it*tstep+phase);
-			float dy = ir*rstep*sinf(it*tstep+phase);
-			s.SetXMin(centre.XMin()+dx);
-			s.SetYMin(centre.YMin()+dy);
-			samples.push_back(s);
-		}
-	}
+    for (int ir = 1; ir <= nr; ++ir)
+    {
+        float phase = (ir % 2)*tstep/2;
+        for (int it = 0; it < nt; ++it)
+        {
+            float dx = ir*rstep*cosf(it*tstep+phase);
+            float dy = ir*rstep*sinf(it*tstep+phase);
+            s.SetXMin(centre.XMin()+dx);
+            s.SetYMin(centre.YMin()+dy);
+            samples.push_back(s);
+        }
+    }
 
-	return samples;
+    return samples;
 }
 
 vector<FloatRect> Sampler::PixelSamples(FloatRect centre, int radius, bool halfSample)
 {
-	vector<FloatRect> samples;
+    vector<FloatRect> samples;
 
-	IntRect s(centre);
-	samples.push_back(s);
+    IntRect s(centre);
+    samples.push_back(s);
 
-	int r2 = radius*radius;
-	for (int iy = -radius; iy <= radius; ++iy)
-	{
-		for (int ix = -radius; ix <= radius; ++ix)
-		{
-			if (ix*ix+iy*iy > r2) continue;
-			if (iy == 0 && ix == 0) continue; // already put this one at the start
+    int r2 = radius*radius;
+    for (int iy = -radius; iy <= radius; ++iy)
+    {
+        for (int ix = -radius; ix <= radius; ++ix)
+        {
+            if (ix*ix+iy*iy > r2) continue;
+            if (iy == 0 && ix == 0) continue; // already put this one at the start
 
-			int x = (int)centre.XMin() + ix;
-			int y = (int)centre.YMin() + iy;
-			if (halfSample && (ix % 2 != 0 || iy % 2 != 0)) continue;
+            int x = (int)centre.XMin() + ix;
+            int y = (int)centre.YMin() + iy;
+            if (halfSample && (ix % 2 != 0 || iy % 2 != 0)) continue;
 
-			s.SetXMin(x);
-			s.SetYMin(y);
-			samples.push_back(s);
-		}
-	}
+            s.SetXMin(x);
+            s.SetYMin(y);
+            samples.push_back(s);
+        }
+    }
 
-	return samples;
+    return samples;
 }

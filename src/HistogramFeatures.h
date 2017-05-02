@@ -35,11 +35,11 @@ class Config;
 class HistogramFeatures : public Features
 {
 public:
-	HistogramFeatures(const Config& conf);
+    HistogramFeatures(const Config& conf);
 
 private:
 
-	virtual void UpdateFeatureVector(const Sample& s);
+    virtual void UpdateFeatureVector(const Sample& s);
 };
 
 #endif
