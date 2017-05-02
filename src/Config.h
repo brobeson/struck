@@ -106,7 +106,7 @@ public:
     bool                            m_optimizeAll = false;   ///< True -> run optimize step on all support vectors
 
     /// The type of loss function to use.
-    LossFunctionType                m_loss = LossFunctionType::IOU; 
+    LossFunctionType                m_loss = LossFunctionType::IOU;
 
     /// The type of loss function manipulator to use.
     LossManipulatorType             m_manipulator = LossManipulatorType::IDENTITY;
