@@ -37,12 +37,12 @@ class Config;
 class RawFeatures : public Features
 {
 public:
-	RawFeatures(const Config& conf);
+    RawFeatures(const Config& conf);
 
 private:
-	cv::Mat m_patchImage;
+    cv::Mat m_patchImage;
 
-	virtual void UpdateFeatureVector(const Sample& s);
+    virtual void UpdateFeatureVector(const Sample& s);
 };
 
 #endif

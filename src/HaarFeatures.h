@@ -38,14 +38,14 @@ class Config;
 class HaarFeatures : public Features
 {
 public:
-	HaarFeatures(const Config& conf);
+    HaarFeatures(const Config& conf);
 
 private:
-	std::vector<HaarFeature> m_features;
+    std::vector<HaarFeature> m_features;
 
-	virtual void UpdateFeatureVector(const Sample& s);
+    virtual void UpdateFeatureVector(const Sample& s);
 
-	void GenerateSystematic();
+    void GenerateSystematic();
 };
 
 #endif

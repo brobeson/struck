@@ -43,30 +43,30 @@ class ImageRep;
 class Tracker
 {
 public:
-	Tracker(const Config& conf);
-	~Tracker();
+    Tracker(const Config& conf);
+    ~Tracker();
 
-	void Initialise(const cv::Mat& frame, FloatRect bb);
-	void Reset();
-	void Track(const cv::Mat& frame);
-	void Debug();
+    void Initialise(const cv::Mat& frame, FloatRect bb);
+    void Reset();
+    void Track(const cv::Mat& frame);
+    void Debug();
 
-	inline const FloatRect& GetBB() const { return m_bb; }
-	inline bool IsInitialised() const { return m_initialised; }
+    inline const FloatRect& GetBB() const { return m_bb; }
+    inline bool IsInitialised() const { return m_initialised; }
 
 private:
-	const Config& m_config;
-	bool m_initialised;
-	std::vector<Features*> m_features;
-	std::vector<Kernel*> m_kernels;
-	LaRank* m_pLearner;
-	FloatRect m_bb;
-	cv::Mat m_debugImage;
-	bool m_needsIntegralImage;
-	bool m_needsIntegralHist;
+    const Config& m_config;
+    bool m_initialised;
+    std::vector<Features*> m_features;
+    std::vector<Kernel*> m_kernels;
+    LaRank* m_pLearner;
+    FloatRect m_bb;
+    cv::Mat m_debugImage;
+    bool m_needsIntegralImage;
+    bool m_needsIntegralHist;
 
-	void UpdateLearner(const ImageRep& image);
-	void UpdateDebugImage(const std::vector<FloatRect>& samples, const FloatRect& centre, const std::vector<double>& scores);
+    void UpdateLearner(const ImageRep& image);
+    void UpdateDebugImage(const std::vector<FloatRect>& samples, const FloatRect& centre, const std::vector<double>& scores);
 };
 
 #endif

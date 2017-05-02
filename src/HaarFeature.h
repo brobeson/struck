@@ -38,16 +38,16 @@ class Sample;
 class HaarFeature
 {
 public:
-	HaarFeature(const FloatRect& bb, int type);
-	~HaarFeature();
+    HaarFeature(const FloatRect& bb, int type);
+    ~HaarFeature();
 
-	float Eval(const Sample& s) const;
+    float Eval(const Sample& s) const;
 
 private:
-	FloatRect m_bb;
-	std::vector<FloatRect> m_rects;
-	std::vector<float> m_weights;
-	float m_factor;
+    FloatRect m_bb;
+    std::vector<FloatRect> m_rects;
+    std::vector<float> m_weights;
+    float m_factor;
 };
 
 #endif
