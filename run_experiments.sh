@@ -26,7 +26,7 @@ sed --in-place 's/#\?svmC.*$/svmC = 100.0/' ${config_file}
 sed --in-place 's/#\?svmBudgetSize.*$/svmBudgetSize = 100/' ${config_file}
 sed --in-place 's/#\?seed =.*$/seed = '${random_seed}'/' ${config_file}
 
-sequences=("coke11" "david" "faceocc" "faceocc2" "girl" "sylv" "tiger1" "tiger2")
+sequences=("cliffbar" "coke11" "david" "dollar" "faceocc" "faceocc2" "girl" "surfer" "sylv" "tiger1" "tiger2" "twinings")
 for s in ${sequences[@]}
 do
     echo "---------------------------------------------------"
