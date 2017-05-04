@@ -31,6 +31,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
+#include <thread>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -230,6 +231,10 @@ int main(int argc, char* argv[])
         namedWindow("result");
     }
 
+    // not really NTSC. I tried 33, which is close to NTSC, but it was still too fast. I next tried
+    // 66, which was a touch too slow. 50 is the magic number.
+    constexpr std::chrono::milliseconds ntsc_frame_time(50);
+
     Mat result(conf.frameHeight, conf.frameWidth, CV_8UC3);
     bool paused = false;
     bool doInitialise = false;
@@ -237,6 +242,7 @@ int main(int argc, char* argv[])
     //sift::feature_list sf(conf.bounding_box.Width(), conf.bounding_box.Height());
     for (int frameInd = startFrame; frameInd <= endFrame; ++frameInd)
     {
+        const auto start_time = std::chrono::system_clock::now();
         Mat frame;
         if (useCamera)
         {
@@ -339,7 +345,7 @@ int main(int argc, char* argv[])
             //if (frameInd == startFrame + 23)
                 //struck::write_sample_output(conf.sequenceName, frameInd, result, tracker.GetBB(), fuzzy_tracker.GetBB());
             //struck::write_sample_output(conf.sequenceName, result, tracker.GetBB(), tracker.update_samples());
-            //rectangle(result, tracker.GetBB(), CV_RGB(0, 255, 0));
+            rectangle(result, tracker.GetBB(), CV_RGB(0, 255, 0));
             //cv::imwrite(conf.sequenceName + ".png", result);
 
             if (outFile)
@@ -373,6 +379,12 @@ int main(int argc, char* argv[])
                 cout << "\n\nend of sequence, press any key to exit" << endl;
                 waitKey();
             }
+
+            // if processing the frame took longer than an NTSC frame should be displayed, sleep for
+            // the remaining time. this makes the video playback easier for a person to observe.
+            const auto frame_time = std::chrono::system_clock::now() - start_time;
+            if (frame_time < ntsc_frame_time)
+                std::this_thread::sleep_for(ntsc_frame_time - frame_time);
         }
     }
 
