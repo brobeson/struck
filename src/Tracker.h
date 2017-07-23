@@ -46,42 +46,149 @@ class Kernel;
 class LaRank;
 class ImageRep;
 
+/**
+ * \brief       The class responsible for tracking the target frame to frame.
+ * \details     This is the primary workhorse of the Struck application. This is responsible for
+ *              managing the SVM used for classifying target vs. non-target within the images or
+ *              video frames. The tracker locates the target within a given sequence frame, then
+ *              updates the SVM for future tracking.
+ */
 class Tracker
 {
-public:
-    Tracker(const Config& conf);
-    ~Tracker();
+    public:
+        /**
+         * \brief       Construct a tracker object.
+         * \param[in]   conf        The system configuration.
+         * \throws      Unknown     Anything thrown by constructing data members is allowed to
+         *                          propagate.
+         * \details     This will set up a LaRank structured output SVM for learning.
+         * \see         Reset()
+         */
+        Tracker(const Config& conf);
 
-    void Initialise(const cv::Mat& frame, FloatRect bb);
-    template <class SVM_type>
-        void Reset();
-    void Track(const cv::Mat& frame);
-    void Debug();
+        /**
+         * \brief   Destroy a tracker object.
+         * \throws  None
+         */
+        ~Tracker();
 
-    inline const FloatRect& GetBB() const { return m_bb; }
-    inline bool IsInitialised() const { return m_initialised; }
+        /**
+         * \brief       Initialize the tracker for tracking a target in a video or image sequence.
+         * \param[in]   frame   The first frame of the sequence.
+         * \param[in]   bb      The bounding box for the target within the first \a frame.
+         * \throws      Unknown
+         * \details     This function will set the initial target bounding box, and update the SVM
+         *              so that it learns from the first frame and target bounding box.
+         */
+        void Initialise(const cv::Mat& frame, FloatRect bb);
 
-    /**
-     * \brief   Get the set of samples used for updating the learner.
-     * \return  A copy of the update samples.
-     * \throws  None
-     */
-    std::vector<FloatRect> update_samples() const noexcept { return m_update_samples; }
+        /**
+         * \brief       Reset how the tracker tracks a target.
+         * \tparam      SVM_type    The type of SVM to use for learning. This must be LaRank, or a
+         *                          class derived from LaRank.
+         * \throws      Unknown
+         * \warning     This will delete the current SVM state. All learned data will be lost. This
+         *              probably shouldn't be executed in the middle of tracking.
+         * \details     This function will set up a new SVM for learning the tracking discriminant
+         *              function. It resets all the types of features extracted from the image
+         *              samples, and the kernel functions used for evaluating the discriminant
+         *              function.
+         */
+        template <class SVM_type>
+            void Reset();
 
-private:
-    const Config& m_config;
-    bool m_initialised;
-    std::vector<Features*> m_features;
-    std::vector<Kernel*> m_kernels;
-    LaRank* m_pLearner;
-    FloatRect m_bb;
-    cv::Mat m_debugImage;
-    bool m_needsIntegralImage;
-    bool m_needsIntegralHist;
-    std::vector<FloatRect> m_update_samples; ///< The list of samples used to update the learner.
+        /**
+         * \brief       Attempt to the locate the target in a sequence frame.
+         * \param[in]   frame   The image or video frame in which to locate the target.
+         * \throws      Unknown.
+         * \details     This function will attempt to locate the target within the given \a frame.
+         *              It samples the frame around the bounding box location from the previous
+         *              frame. For each sample, it will extract features, which are used to evaluate
+         *              the discriminant function. The sample with the highest discriminant function
+         *              value is regarded as the new target location. After locating the target,
+         *              this function will update the SVM.
+         */
+        void Track(const cv::Mat& frame);
 
-    void UpdateLearner(const ImageRep& image);
-    void UpdateDebugImage(const std::vector<FloatRect>& samples, const FloatRect& centre, const std::vector<double>& scores);
+        /**
+         * \brief       Show debugging visualizations.
+         * \throws      Unknown
+         * \details     This will show visualizations useful for debugging and analysis. It will
+         *              also have the SVM do the same.
+         */
+        void Debug();
+
+        /**
+         * \brief   Get the current bounding box of the target.
+         * \throws  None
+         */
+        const FloatRect& GetBB() const { return m_bb; }
+
+        /**
+         * \brief   Query if the tracker has been initialized.
+         * \retval  true    The tracker has been initialized.
+         * \retval  false   The tracker has not been initialized.
+         * \throws  None
+         * \see     Initialise()
+         */
+        bool IsInitialised() const { return m_initialised; }
+
+        /**
+         * \brief   Get the set of samples used for updating the learner.
+         * \return  A copy of the update samples.
+         * \throws  None
+         */
+        std::vector<FloatRect> update_samples() const noexcept { return m_update_samples; }
+
+    private:
+        /// The system-wide configuration.
+        const Config& m_config;
+
+        /// True indicates that the tracker has been initialized with a first frame and target
+        /// bounding box.
+        bool m_initialised;
+
+        /// A list of types of features to extract from image samples.
+        std::vector<Features*> m_features;
+
+        /// A list of kernel functions to use for evaluating the discriminant function.
+        std::vector<Kernel*> m_kernels;
+
+        /// The SVM for classifying feature vectors.
+        LaRank* m_pLearner;
+
+        /**
+         * \brief   The bounding box of the target.
+         * \warning This is only applicable for the last frame submitted to the Track() function.
+         */
+        FloatRect m_bb;
+
+        /**
+         * \brief   An image visualizing tracking data.
+         * \details This is useful for debugging and for analyzing performance.
+         * \todo    Figure out what this visualization represents.
+         */
+        cv::Mat m_debugImage;
+
+        bool m_needsIntegralImage;
+        bool m_needsIntegralHist;
+
+        /// The list of samples used to update the learner.
+        std::vector<FloatRect> m_update_samples;
+
+        /**
+         * \brief       Update the SVM.
+         * \param[in]   image   Unknown
+         * \throws      Unknown
+         * \details     After locating the target in the current frame, this function updates the
+         *              SVM so that it learns from the new target location and representation. This
+         *              samples the image around the target bounding box, then causes the SVM to
+         *              update itself with those samples.
+         * \todo        Figure out what an ImageRep object is.
+         */
+        void UpdateLearner(const ImageRep& image);
+
+        void UpdateDebugImage(const std::vector<FloatRect>& samples, const FloatRect& centre, const std::vector<double>& scores);
 };
 
 template <class SVM_type>

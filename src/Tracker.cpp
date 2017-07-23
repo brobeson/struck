@@ -69,7 +69,6 @@ Tracker::~Tracker()
     }
 }
 
-
 void Tracker::Initialise(const cv::Mat& frame, FloatRect bb)
 {
     m_bb = IntRect(bb);

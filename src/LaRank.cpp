@@ -264,6 +264,8 @@ pair<int, double> LaRank::MinGradient(int ind)
     pair<int, double> minGrad(-1, DBL_MAX);
     for (int i = 0; i < (int)sp->yv.size(); ++i)
     {
+        /// \todo This is a bug. The manipulator is shaping more than the loss function. The
+        ///       parentheses for m_pManipulator->evaluate() are around too many terms.
         double grad = -m_pManipulator->evaluate(m_pLoss->evaluate(sp->yv[i], sp->yv[sp->y]) - Evaluate(sp->x[i], sp->yv[i]));
         if (grad < minGrad.second)
         {
